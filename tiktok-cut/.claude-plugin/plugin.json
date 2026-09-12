@@ -1,0 +1,6 @@
+{
+  "name": "tiktok-cut",
+  "description": "Cut vertical short-form video (TikTok, Reels, Shorts) with ffmpeg from a small edit JSON, then preview the result in a phone-frame artifact.",
+  "version": "0.1.0",
+  "author": { "name": "Haley Massa" }
+}

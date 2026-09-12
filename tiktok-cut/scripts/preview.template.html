@@ -1,0 +1,161 @@
+<title>__TITLE__</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #f5f4f0; --surface: #ffffff; --ink: #1a1a1e; --muted: #6b6a66; --line: #e3e1db;
+    --accent: #b8791a; --accent-ink: #ffffff; --active: #fbf1dc; --bezel: #2a2a30; --screen: #000;
+    --sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --display: "Sora", "IBM Plex Sans", Arial, sans-serif;
+    --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #131316; --surface: #1c1c21; --ink: #eceae4; --muted: #8e8c86; --line: #2a2a30;
+      --accent: #f2b441; --accent-ink: #1a1a1e; --active: #2a2418; --bezel: #0b0b0d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #131316; --surface: #1c1c21; --ink: #eceae4; --muted: #8e8c86; --line: #2a2a30;
+    --accent: #f2b441; --accent-ink: #1a1a1e; --active: #2a2418; --bezel: #0b0b0d;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--ground); color: var(--ink); font-family: var(--sans); padding-inline: 20px; padding-block: 28px 48px; line-height: 1.5; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { margin-bottom: 24px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  h1 { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1.2; margin: 6px 0 0; text-wrap: balance; }
+  .layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 32px; align-items: start; }
+  @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } .stage { justify-self: center; } }
+
+  /* Phone */
+  .stage { position: sticky; top: 16px; }
+  .phone { width: 300px; max-width: 100%; aspect-ratio: 9 / 19.5; background: var(--bezel); border-radius: 44px; padding: 12px; box-shadow: 0 20px 50px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.06); position: relative; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 34px; overflow: hidden; background: var(--screen); }
+  .screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 34%; height: 24px; background: #000; border-radius: 999px; z-index: 3; }
+  .zones { position: absolute; inset: 0; pointer-events: none; z-index: 2; display: none; }
+  .zones.on { display: block; }
+  .zone { position: absolute; background: rgba(242,180,65,.18); border: 1px dashed rgba(242,180,65,.75); }
+  .zone span { position: absolute; left: 6px; top: 4px; font: 500 9px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #f2b441; }
+  .zone.top { left: 0; right: 0; top: 0; height: 14%; }
+  .zone.bottom { left: 0; right: 0; bottom: 0; height: 24%; }
+  .zone.rail { right: 0; top: 30%; width: 15%; height: 46%; }
+  .tap { position: absolute; inset: 0; z-index: 4; background: none; border: 0; cursor: pointer; }
+  .tap:focus-visible { outline: 3px solid var(--accent); outline-offset: -6px; border-radius: 34px; }
+  .tap .badge { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 64px; height: 64px; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; display: grid; place-items: center; font-size: 26px; transition: opacity .2s; }
+  .tap.playing .badge { opacity: 0; }
+  .controls { display: flex; gap: 10px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+  .controls button { font: 500 13px var(--sans); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+  .controls button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .controls button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .clock { font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; margin-left: auto; }
+
+  /* Right column */
+  h2 { font-family: var(--display); font-size: 15px; font-weight: 600; margin: 0 0 10px; }
+  section + section { margin-top: 28px; }
+  .track { border-top: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 96px 1fr; gap: 14px; padding: 10px 8px; border-bottom: 1px solid var(--line); cursor: pointer; align-items: baseline; }
+  .row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .row.hook .text { color: var(--accent); font-weight: 500; }
+  .row.active { background: var(--active); }
+  .row .tc { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .row.active .tc { color: var(--accent); }
+  .row .text { font-size: 15px; }
+  .row .kind { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-left: 8px; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 20px; margin: 0; font-size: 14px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+  .note { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  @media (prefers-reduced-motion: reduce) { .tap .badge { transition: none; } }
+</style>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Vertical cut · 9:16 preview</div>
+    <h1 id="title">__TITLE__</h1>
+  </header>
+  <div class="layout">
+    <div class="stage">
+      <div class="phone">
+        <div class="screen">
+          <div class="island"></div>
+          <video id="v" playsinline preload="metadata" loop></video>
+          <div class="zones" id="zones" aria-hidden="true">
+            <div class="zone top"><span>account · sound</span></div>
+            <div class="zone rail"><span>rail</span></div>
+            <div class="zone bottom"><span>caption · sound bar</span></div>
+          </div>
+          <button class="tap" id="tap" aria-label="Play or pause"><span class="badge">▶</span></button>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="restart" type="button">Restart</button>
+        <button id="zoneBtn" type="button" aria-pressed="false">Safe zones</button>
+        <span class="clock"><span id="now">0:00.0</span> / <span id="dur">–</span></span>
+      </div>
+    </div>
+    <div>
+      <section>
+        <h2>Caption track</h2>
+        <div class="track" id="track"></div>
+        <p class="note">Click a line to jump there. The highlighted line follows the video.</p>
+      </section>
+      <section>
+        <h2>Edit sheet</h2>
+        <dl id="sheet"></dl>
+      </section>
+    </div>
+  </div>
+</div>
+<script>
+  const edit = __EDIT_JSON__;
+  const v = document.getElementById("v");
+  const tap = document.getElementById("tap");
+  const track = document.getElementById("track");
+  const now = document.getElementById("now");
+  const dur = document.getElementById("dur");
+  v.src = edit.video;
+
+  const fmt = (s) => { const m = Math.floor(s / 60); const r = (s - m * 60).toFixed(1).padStart(4, "0"); return `${m}:${r}`; };
+  const lines = [];
+  if (edit.hook) lines.push({ ...edit.hook, kind: "hook" });
+  for (const c of edit.captions) lines.push({ ...c, kind: "caption" });
+  lines.sort((a, b) => a.start - b.start);
+  const rows = lines.map((l) => {
+    const el = document.createElement("div");
+    el.className = "row " + l.kind; el.tabIndex = 0; el.setAttribute("role", "button");
+    el.innerHTML = `<span class="tc">${fmt(l.start)} → ${fmt(l.end)}</span><span class="text">${escape(l.text)}${l.kind === "hook" ? '<span class="kind">hook</span>' : ""}</span>`;
+    const go = () => { v.currentTime = l.start + 0.01; play(); };
+    el.addEventListener("click", go);
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    track.appendChild(el);
+    return { el, l };
+  });
+  function escape(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+  function play() { v.play().then(() => tap.classList.add("playing")).catch(() => {}); }
+  function pause() { v.pause(); tap.classList.remove("playing"); }
+  tap.addEventListener("click", () => (v.paused ? play() : pause()));
+  document.getElementById("restart").addEventListener("click", () => { v.currentTime = 0; play(); });
+  const zoneBtn = document.getElementById("zoneBtn");
+  zoneBtn.addEventListener("click", () => {
+    const on = document.getElementById("zones").classList.toggle("on");
+    zoneBtn.setAttribute("aria-pressed", String(on));
+  });
+  v.addEventListener("loadedmetadata", () => { dur.textContent = fmt(v.duration); });
+  v.addEventListener("pause", () => tap.classList.remove("playing"));
+  v.addEventListener("timeupdate", () => {
+    const t = v.currentTime; now.textContent = fmt(t);
+    for (const { el, l } of rows) el.classList.toggle("active", t >= l.start && t < l.end);
+  });
+
+  const sheet = document.getElementById("sheet");
+  const trimText = edit.trim.start != null || edit.trim.end != null ? `${edit.trim.start ?? 0}s → ${edit.trim.end ?? "end"}s` : "none";
+  const items = [
+    ["Source", edit.source ?? "–"],
+    ["Trim", trimText],
+    ["Speed", `${edit.speed}×`],
+    ["Frame", `${edit.size.w} × ${edit.size.h} (9:16)`],
+    ["Captions", `${edit.captions.length} lines${edit.hook ? " + hook" : ""}`],
+    ["Output", edit.output],
+  ];
+  for (const [k, val] of items) { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = val; sheet.append(dt, dd); }
+</script>

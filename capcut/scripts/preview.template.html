@@ -70,7 +70,7 @@
 </style>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Vertical cut · 9:16 preview</div>
+    <div class="eyebrow">CapCut draft · preview render</div>
     <h1 id="title">__TITLE__</h1>
   </header>
   <div class="layout">
@@ -100,8 +100,9 @@
         <p class="note">Click a line to jump there. The highlighted line follows the video.</p>
       </section>
       <section>
-        <h2>Edit sheet</h2>
-        <dl id="sheet"></dl>
+        <h2>Clips on the timeline</h2>
+        <div class="track" id="clips"></div>
+        <dl id="sheet" style="margin-top:16px"></dl>
       </section>
     </div>
   </div>
@@ -116,10 +117,7 @@
   v.src = edit.video;
 
   const fmt = (s) => { const m = Math.floor(s / 60); const r = (s - m * 60).toFixed(1).padStart(4, "0"); return `${m}:${r}`; };
-  const lines = [];
-  if (edit.hook) lines.push({ ...edit.hook, kind: "hook" });
-  for (const c of edit.captions) lines.push({ ...c, kind: "caption" });
-  lines.sort((a, b) => a.start - b.start);
+  const lines = edit.lines;
   const rows = lines.map((l) => {
     const el = document.createElement("div");
     el.className = "row " + l.kind; el.tabIndex = 0; el.setAttribute("role", "button");
@@ -147,15 +145,17 @@
     for (const { el, l } of rows) el.classList.toggle("active", t >= l.start && t < l.end);
   });
 
+  const clipsEl = document.getElementById("clips");
+  for (const c of edit.clips) {
+    const el = document.createElement("div"); el.className = "row"; el.tabIndex = 0; el.setAttribute("role", "button");
+    const extra = [c.srcStart != null ? `in ${c.srcStart}s` : null, c.speed !== 1 ? `${c.speed}×` : null, c.type === "audio" ? `vol ${c.volume}` : null, c.scale && c.scale !== 1 ? `scale ${c.scale}` : null].filter(Boolean).join(" · ");
+    el.innerHTML = `<span class="tc">${fmt(c.start)} → ${fmt(c.end)}</span><span class="text">${escape(c.label)}<span class="kind">${escape(c.track)}${extra ? " · " + escape(extra) : ""}</span></span>`;
+    const go = () => { v.currentTime = c.start + 0.01; play(); };
+    el.addEventListener("click", go); el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    clipsEl.appendChild(el);
+  }
   const sheet = document.getElementById("sheet");
-  const trimText = edit.trim.start != null || edit.trim.end != null ? `${edit.trim.start ?? 0}s → ${edit.trim.end ?? "end"}s` : "none";
-  const items = [
-    ["Source", edit.source ?? "–"],
-    ["Trim", trimText],
-    ["Speed", `${edit.speed}×`],
-    ["Frame", `${edit.size.w} × ${edit.size.h} (9:16)`],
-    ["Captions", `${edit.captions.length} lines${edit.hook ? " + hook" : ""}`],
-    ["Output", edit.output],
-  ];
+  const items = [["Draft", edit.title], ["Canvas", `${edit.canvas.width} × ${edit.canvas.height} @ ${edit.fps} fps`], ["Length", `${edit.durationSec}s`], ["Text lines", String(edit.lines.length)]];
+  if (edit.skipped.length) items.push(["Not in preview", edit.skipped.join("; ")]);
   for (const [k, val] of items) { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = val; sheet.append(dt, dd); }
 </script>

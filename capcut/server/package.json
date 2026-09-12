@@ -1,0 +1,12 @@
+{
+  "name": "capcut-plugin-server",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP server that drives CapCut desktop drafts. No runtime dependencies; ffmpeg-static is optional for machines without ffmpeg.",
+  "bin": { "capcut-mcp": "server.mjs" },
+  "scripts": { "start": "node server.mjs", "test": "node test/run.mjs" },
+  "optionalDependencies": { "ffmpeg-static": "^5.2.0", "ffprobe-static": "^3.1.0" },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}

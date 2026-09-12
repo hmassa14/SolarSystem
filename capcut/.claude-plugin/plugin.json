@@ -1,0 +1,7 @@
+{
+  "name": "capcut",
+  "description": "Drive CapCut desktop from Claude Code: build and edit real CapCut drafts from a folder of raw clips, analyze footage, add hooks and captions, and preview the cut in a phone frame before opening CapCut.",
+  "version": "0.2.0",
+  "author": { "name": "Haley Massa" },
+  "keywords": ["capcut", "tiktok", "video", "short-form", "editing"]
+}
